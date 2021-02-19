@@ -2,6 +2,8 @@
 
 ### Setup
 
+__USE PYTHON 3.6__
+
 - Install dependencies with:
 
 ```bash
