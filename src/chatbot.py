@@ -6,19 +6,19 @@ import tensorflow as tf
 
 # import gpt.model, gpt.sample, gpt.encoder
 
-model_name='117M'
+model_name='dojo10k'
 batch_size = 1
 seed = None
 nsamples=1
-length=10
-temperature=1
-top_k=0
+length=30
+temperature=0.7
+top_k=40
 np.random.seed(seed)
 tf.set_random_seed(seed)
 
 enc = encoder.get_encoder(model_name)
 hparams = model.default_hparams()
-with open(os.path.join('models', model_name, 'hparams.json')) as f:
+with open(os.path.join('../models', model_name, 'hparams.json')) as f:
     hparams.override_from_dict(json.load(f))
 
 if length is None:
@@ -36,7 +36,7 @@ with tf.Session(graph=tf.Graph()) as sess:
     )
 
     saver = tf.train.Saver()
-    ckpt = tf.train.latest_checkpoint(os.path.join('models', model_name))
+    ckpt = tf.train.latest_checkpoint(os.path.join('../models', model_name))
     saver.restore(sess, ckpt)
 
     raw_text = "hello sir"

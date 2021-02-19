@@ -10,7 +10,7 @@ logging.basicConfig(level=logging.INFO)
 with open('./config/auth.json') as data_file:
     auth = json.load(data_file)
 
-bot = commands.Bot(command_prefix=commands.when_mentioned_or('!'), description='GPT-2', max_messages=5000)
+bot = commands.Bot(command_prefix=commands.when_mentioned_or('.dojo'), description='GPT-2', max_messages=5000)
 # gptCog = GPT2Bot(bot)
 # bot.add_cog(gptCog)
 initial_extensions = ['gptchatbot']

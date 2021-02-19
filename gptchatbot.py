@@ -25,15 +25,15 @@ class GPT2Bot(commands.Cog):
         self.is_inferencing = False
     
     def init_state(self):
-        self.model_name='117M'
+        self.model_name='dojo10k'
         self.batch_size = 1
         self.seed = 42069
         self.nsamples=1
-        self.length=10
+        self.length=40
         self.temperature=1
         self.top_k=0
     
-    def set_state(self, nsamples, length, temperature, top_k, model_name = '117M',):
+    def set_state(self, nsamples, length, temperature, top_k, model_name = 'dojo10k',):
         self.nsamples = nsamples
         self.length = length
         self.temperature = temperature
@@ -108,7 +108,7 @@ class GPT2Bot(commands.Cog):
                     await ctx.send(response)
 
         self.is_inferencing = False
-    
+
     def generate_text(self, context_tokens):
         return self.session.run(self.output, feed_dict={
                     self.context: [context_tokens for _ in range(1)]
@@ -124,15 +124,15 @@ class GPT2Bot(commands.Cog):
         await ctx.send('Top K: ' + str(self.top_k))
         await ctx.send('Model: ' + str(self.model_name))
 
-    @commands.command()
-    @commands.guild_only()
+    # @commands.command()
+    # @commands.guild_only()
     async def helpconfig(self, ctx):
         logging.info('Help Invoked.')
         await ctx.send('Configure the bot session by `!setconfig <nsamples> <length> <temperature> <topk> <model: 117M or 345M>`.')
         await ctx.send('Get current state by `!getconfig`.')
 
-    @commands.command()
-    @commands.guild_only()
+    # @commands.command()
+    # @commands.guild_only()
     async def setconfig(self, ctx, nsamples: int, length: int, temp: float, top_k: int, model_name: str):
         logging.info('Set configuration.')
         if (self.is_inferencing):
@@ -142,6 +142,27 @@ class GPT2Bot(commands.Cog):
         await ctx.trigger_typing()
         self.shutdown()
         self.set_state(int(nsamples), int(length), float(temp), int(top_k), model_name)
+        await ctx.trigger_typing()
+        self.preinit_model()
+        self.session = tf.InteractiveSession(graph=tf.Graph())
+        await ctx.trigger_typing()
+        self.init_model()
+
+        await ctx.send('Succesfully Set Configuration!')
+        if (self.nsamples * self.length > 100):
+            await ctx.send('The configuration parameters are process intensive, responses may take a while.')
+
+    @commands.command()
+    @commands.guild_only()
+    async def setlength(self, ctx, length: int):
+        logging.info('Set configuration.')
+        if (self.is_inferencing):
+            await ctx.send('Currently talking to someone. Try again later.')
+            return
+
+        await ctx.trigger_typing()
+        self.shutdown()
+        self.set_state(self.nsamples, length, self.temperature, self.top_k, self.model_name)
         await ctx.trigger_typing()
         self.preinit_model()
         self.session = tf.InteractiveSession(graph=tf.Graph())
